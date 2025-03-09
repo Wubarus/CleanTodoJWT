@@ -10,16 +10,19 @@ import (
 	"os"
 )
 
+// UserHandler struct that contains service
 type UserHandler struct {
 	svc services.UserService
 }
 
+// New UserHandler instance
 func NewUserHandler(UserService services.UserService) *UserHandler {
 	return &UserHandler{
 		svc: UserService,
 	}
 }
 
+// Register endpoint
 func (h *UserHandler) Register(ctx *gin.Context) {
 	var user domain.User
 
@@ -39,7 +42,26 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 	})
 }
 
-func (h *UserHandler) ReadUser(ctx *gin.Context) {
+// Login endpoint
+func (h *UserHandler) Login(ctx *gin.Context) {
+	var user domain.User
+
+	err := ctx.BindJSON(&user)
+	if err != nil {
+		utils.NewErrorResponse(ctx, http.StatusBadRequest, "invalid input")
+	}
+
+	loginResp, err := h.svc.Login(user.Email, user.Password)
+	if err != nil {
+		utils.NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, loginResp)
+}
+
+// Getting user instance by id
+func (h *UserHandler) GetUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	user, err := h.svc.ReadUser(id)
@@ -51,15 +73,19 @@ func (h *UserHandler) ReadUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
+// Updating user instance by
+// Owner only
 func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 	const oper = "internal.adapter.handlers.user.UpdateUser"
 
+	// Get user JWT token
 	claims, err := utils.ValidateToken(ctx.Request.Header.Get("Authorization"), os.Getenv("JWT_SECRET"))
 	if err != nil {
 		utils.NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	// Get userId by JWT token
 	userId, err := claims.GetSubject()
 	if err != nil {
 		fmt.Printf("failed to get userId %v: %v", oper, err)
@@ -82,15 +108,19 @@ func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 	})
 }
 
+// Deleting user instance by id
+// Owner only
 func (h *UserHandler) DeleteUser(ctx *gin.Context) {
 	const oper = "internal.adapter.handlers.user.DeleteUser"
 
+	// Get user JWT token
 	claims, err := utils.ValidateToken(ctx.Request.Header.Get("Authorization"), os.Getenv("JWT_SECRET"))
 	if err != nil {
 		utils.NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	// Get userId by JWT token
 	userId, err := claims.GetSubject()
 	if err != nil {
 		fmt.Printf("failed to get userId %v: %v", oper, err)

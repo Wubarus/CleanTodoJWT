@@ -72,9 +72,10 @@ func InitRoutes() {
 
 	userHandler := handlers.NewUserHandler(*userSrv)
 
-	//TODO: implement users to auth
 	//TODO: make routes to tasks
-	router.POST("/users", userHandler.Register)
+	router.POST("/auth/register", userHandler.Register)
+	router.POST("/auth/login", userHandler.Login)
+
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
