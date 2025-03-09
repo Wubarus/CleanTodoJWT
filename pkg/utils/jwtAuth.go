@@ -14,24 +14,17 @@ type LoginResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-func GenerateAccessToken(userId, jwtSecret string) (string, error) {
+// Token generation
+func GenerateToken(userId, jwtSecret string, expiresHours time.Duration) (string, error) {
 	claims := jwt.RegisteredClaims{
 		Subject:   userId,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour).UTC()),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresHours * time.Hour).UTC()),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(jwtSecret))
 }
 
-func GenerateRefreshToken(userId, jwtSecret string) (string, error) {
-	claims := jwt.RegisteredClaims{
-		Subject:   userId,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour).UTC()),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(jwtSecret))
-}
-
+// Token validation
 func ValidateToken(tokenString, secret string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
