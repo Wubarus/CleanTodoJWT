@@ -55,12 +55,12 @@ func (s *Storage) Login(email, password string) (*utils.LoginResponse, error) {
 		return nil, errors.New("password not matched")
 	}
 
-	accessToken, err := utils.GenerateAccessToken(user.Id, os.Getenv("JWT_SECRET"))
+	accessToken, err := utils.GenerateToken(user.Id, os.Getenv("JWT_SECRET"), 1)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user.Id, os.Getenv("JWT_SECRET"))
+	refreshToken, err := utils.GenerateToken(user.Id, os.Getenv("JWT_SECRET"), 48)
 	if err != nil {
 		return nil, err
 	}
