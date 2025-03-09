@@ -11,6 +11,7 @@ import (
 	"os"
 )
 
+// Repository Registration
 func (s *Storage) Register(username, email, password string) (*domain.User, error) {
 	var user domain.User
 	query := s.db.First(&user, "email = ?", email)
@@ -37,6 +38,7 @@ func (s *Storage) Register(username, email, password string) (*domain.User, erro
 	return &user, nil
 }
 
+// Repository Login
 func (s *Storage) Login(email, password string) (*utils.LoginResponse, error) {
 	var user domain.User
 	if err := godotenv.Load(); err != nil {
@@ -72,7 +74,8 @@ func (s *Storage) Login(email, password string) (*utils.LoginResponse, error) {
 	}, nil
 }
 
-func (s *Storage) ReadUser(id string) (*domain.User, error) {
+// Getting repository user instance
+func (s *Storage) GetUser(id string) (*domain.User, error) {
 	var user domain.User
 
 	query := s.db.First(&user, "id = ? ", id)
@@ -83,6 +86,7 @@ func (s *Storage) ReadUser(id string) (*domain.User, error) {
 	return &user, nil
 }
 
+// Updating repository user instance
 func (s *Storage) UpdateUser(id, email, username, password string) error {
 	var user domain.User
 	query := s.db.First(&user, "id = ?", id)
@@ -109,6 +113,7 @@ func (s *Storage) UpdateUser(id, email, username, password string) error {
 	return nil
 }
 
+// Deleting repository user instance
 func (s *Storage) DeleteUser(id string) error {
 	user := &domain.User{}
 	query := s.db.Where("id = ?", id).Delete(&user)

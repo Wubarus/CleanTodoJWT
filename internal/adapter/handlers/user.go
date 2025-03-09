@@ -64,7 +64,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 func (h *UserHandler) GetUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	user, err := h.svc.ReadUser(id)
+	user, err := h.svc.GetUser(id)
 
 	if err != nil {
 		utils.NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
