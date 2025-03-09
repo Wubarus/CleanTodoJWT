@@ -44,8 +44,13 @@ func (s *Storage) Login(email, password string) (*utils.LoginResponse, error) {
 	}
 
 	query := s.db.First(&user, "email = ?", email)
-	if query.RowsAffected != 0 {
+	if query.RowsAffected == 0 {
 		return nil, errors.New("user not found")
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, errors.New("password not matched")
 	}
 
 	accessToken, err := utils.GenerateAccessToken(user.Id, os.Getenv("JWT_SECRET"))
