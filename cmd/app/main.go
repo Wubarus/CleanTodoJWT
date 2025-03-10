@@ -1,13 +1,13 @@
 package main
 
 import (
-	router "CTodo/internal/adapter"
 	"CTodo/internal/adapter/handlers"
 	"CTodo/internal/adapter/repo"
 	"CTodo/internal/adapter/routes"
 	"CTodo/internal/config"
 	"CTodo/internal/core/domain"
 	"CTodo/internal/core/services"
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lpernett/godotenv"
@@ -17,6 +17,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 var (
@@ -50,6 +53,7 @@ func main() {
 
 	//TODO: init log & cover project with it
 
+	// Data migration to DB
 	err = db.AutoMigrate(&domain.Task{}, &domain.User{}, &domain.TaskList{})
 	if err != nil {
 		panic(err.Error())
@@ -58,13 +62,42 @@ func main() {
 	// DB injection to storage
 	storage := repo.NewStorage(db)
 
+	router := gin.Default()
+
 	// init user Service, Handler, Router with dep injection
+	//TODO: create supergroup with users, separated auth, tasks
 	userService := services.NewUserService(storage)
 	userHandler := handlers.NewUserHandler(userService)
-	userRouter := routes.NewUserRouter(userHandler)
+	routes.NewUserRouter(router, userHandler)
 
-	//server init
+	// server init
+	srv := &http.Server{
+		Addr:         cfg.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
+	}
 
+	log.Println("Starting server...")
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
+
+	log.Println("Server exiting")
 }
 
 func PostgresInit(cfg *config.Config) (*gorm.DB, error) {

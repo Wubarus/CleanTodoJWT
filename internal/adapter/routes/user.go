@@ -14,9 +14,7 @@ type UserHandler interface {
 }
 
 // NewUserRouter designed to manage user routes
-func NewUserRouter(userHandler UserHandler) *gin.RouterGroup {
-	router := gin.Default()
-
+func NewUserRouter(router *gin.Engine, userHandler UserHandler) *gin.RouterGroup {
 	userRouter := router.Group("")
 	{
 		router.POST("/auth/register", userHandler.Register)
