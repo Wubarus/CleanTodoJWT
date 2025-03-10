@@ -12,11 +12,11 @@ import (
 
 // UserHandler struct that contains service
 type UserHandler struct {
-	svc services.UserService
+	svc *services.UserService
 }
 
 // New UserHandler instance
-func NewUserHandler(UserService services.UserService) *UserHandler {
+func NewUserHandler(UserService *services.UserService) *UserHandler {
 	return &UserHandler{
 		svc: UserService,
 	}

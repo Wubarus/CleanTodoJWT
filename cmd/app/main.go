@@ -1,8 +1,10 @@
 package main
 
 import (
+	router "CTodo/internal/adapter"
 	"CTodo/internal/adapter/handlers"
 	"CTodo/internal/adapter/repo"
+	"CTodo/internal/adapter/routes"
 	"CTodo/internal/config"
 	"CTodo/internal/core/domain"
 	"CTodo/internal/core/services"
@@ -31,7 +33,7 @@ func main() {
 
 	cfg := config.InitConfig()
 
-	// db depends on env variable in config
+	// DB depends on env variable in config
 	switch cfg.Env {
 	// case "test":
 	case "dev":
@@ -53,36 +55,16 @@ func main() {
 		panic(err.Error())
 	}
 
-	//DB injection to storage
+	// DB injection to storage
 	storage := repo.NewStorage(db)
 
-	//storage injection to service
-	userSrv = services.NewUserService(storage)
+	// init user Service, Handler, Router with dep injection
+	userService := services.NewUserService(storage)
+	userHandler := handlers.NewUserHandler(userService)
+	userRouter := routes.NewUserRouter(userHandler)
 
 	//server init
-	//TODO: take out server to internal
-	InitRoutes()
-}
 
-func InitRoutes() {
-	router := gin.Default()
-
-	userHandler := handlers.NewUserHandler(*userSrv)
-
-	//TODO: make routes to tasks
-	router.POST("/auth/register", userHandler.Register)
-	router.POST("/auth/login", userHandler.Login)
-
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-
-	//TODO: log all events & errors
-	log.Println("starting server...")
-	err := router.Run(":8080")
-	if err != nil {
-		log.Fatalf("Error starting server: %v", err)
-	}
 }
 
 func PostgresInit(cfg *config.Config) (*gorm.DB, error) {
