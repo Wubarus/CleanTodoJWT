@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+const (
+	OneHour = 1
+	HalfDay = 12
+	OneDay  = 24
+	TwoDays = 48
+)
+
 type LoginResponse struct {
 	Id           string `json:"id"`
 	Email        string `json:"email"`
