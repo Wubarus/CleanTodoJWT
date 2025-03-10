@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Storage string `yaml:"storage_path"`
+	Env     string `yaml:"env"`
 }
 
 func InitConfig() *Config {

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lpernett/godotenv"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
@@ -21,40 +22,36 @@ var (
 )
 
 func main() {
+	var db *gorm.DB
+	var err error
+
 	if err := godotenv.Load(); err != nil {
 		panic(err)
 	}
 
-	//TODO: init config and use it to setup server
 	cfg := config.InitConfig()
+
+	// db depends on env variable in config
+	switch cfg.Env {
+	// case "test":
+	case "dev":
+		db, err = SqliteInit(cfg)
+	case "prod":
+		db, err = PostgresInit(cfg)
+	default:
+		panic("Config Env not matched")
+	}
+
+	if err != nil {
+		panic(err.Error())
+	}
 
 	//TODO: init log & cover project with it
 
-	//SQLite DB to test
-	db, err := gorm.Open(sqlite.Open(cfg.Storage), &gorm.Config{})
+	err = db.AutoMigrate(&domain.Task{}, &domain.User{}, &domain.TaskList{})
 	if err != nil {
-		fmt.Printf("Failed to connect to %v", err)
-		os.Exit(1)
+		panic(err.Error())
 	}
-
-	//TODO: use Postgres
-	// FOR POSTGRES
-	//host := os.Getenv("DB_HOST")
-	//port := os.Getenv("DB_PORT")
-	//user := os.Getenv("DB_USER")
-	//password := os.Getenv("DB_PASSWORD")
-	//dbname := os.Getenv("DB_NAME")
-	//
-	//conn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-	//	host, port, user, password, dbname)
-	//
-	//db, err := gorm.Open(postgres.Open(conn), &gorm.Config{})
-	//if err != nil {
-	//	fmt.Printf("Failed to connect to %v", err)
-	//	os.Exit(1)
-	//}
-
-	db.AutoMigrate(&domain.Task{}, &domain.User{}, &domain.TaskList{})
 
 	//DB injection to storage
 	storage := repo.NewStorage(db)
@@ -86,4 +83,30 @@ func InitRoutes() {
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
+}
+
+func PostgresInit(cfg *config.Config) (*gorm.DB, error) {
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+
+	conn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	db, err := gorm.Open(postgres.Open(conn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
+func SqliteInit(cfg *config.Config) (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open(cfg.Storage), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }
