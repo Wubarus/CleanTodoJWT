@@ -1,10 +1,10 @@
 package repo
 
 import (
-	"CTodo/internal/core/domain"
-	"CTodo/pkg/utils"
 	"errors"
 	"fmt"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/domain"
+	"github.com/Wubarus/CleanTodoJWT/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/lpernett/godotenv"
 	"golang.org/x/crypto/bcrypt"

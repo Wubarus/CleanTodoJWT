@@ -1,9 +1,9 @@
 package services
 
 import (
-	"CTodo/internal/core/domain"
-	"CTodo/internal/core/ports"
-	"CTodo/pkg/utils"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/domain"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/ports"
+	"github.com/Wubarus/CleanTodoJWT/pkg/utils"
 )
 
 // Service contains repository as ports to DB

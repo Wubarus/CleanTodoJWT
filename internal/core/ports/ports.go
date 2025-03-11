@@ -1,8 +1,8 @@
 package ports
 
 import (
-	"CTodo/internal/core/domain"
-	"CTodo/pkg/utils"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/domain"
+	"github.com/Wubarus/CleanTodoJWT/pkg/utils"
 )
 
 // Ports are guarantee that its instance has listed methods

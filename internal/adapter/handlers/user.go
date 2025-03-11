@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"CTodo/internal/core/domain"
-	"CTodo/internal/core/services"
-	"CTodo/pkg/utils"
 	"fmt"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/domain"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/services"
+	"github.com/Wubarus/CleanTodoJWT/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"

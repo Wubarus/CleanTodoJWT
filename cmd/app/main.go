@@ -1,14 +1,14 @@
 package main
 
 import (
-	"CTodo/internal/adapter/handlers"
-	"CTodo/internal/adapter/repo"
-	"CTodo/internal/adapter/routes"
-	"CTodo/internal/config"
-	"CTodo/internal/core/domain"
-	"CTodo/internal/core/services"
 	"context"
 	"fmt"
+	"github.com/Wubarus/CleanTodoJWT/internal/adapter/handlers"
+	"github.com/Wubarus/CleanTodoJWT/internal/adapter/repo"
+	"github.com/Wubarus/CleanTodoJWT/internal/adapter/routes"
+	"github.com/Wubarus/CleanTodoJWT/internal/config"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/domain"
+	"github.com/Wubarus/CleanTodoJWT/internal/core/services"
 	"github.com/gin-gonic/gin"
 	"github.com/lpernett/godotenv"
 	"gorm.io/driver/postgres"
