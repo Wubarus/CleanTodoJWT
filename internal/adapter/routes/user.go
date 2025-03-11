@@ -17,11 +17,11 @@ type UserHandler interface {
 func NewUserRouter(router *gin.Engine, userHandler UserHandler) *gin.RouterGroup {
 	userRouter := router.Group("")
 	{
-		router.POST("/auth/register", userHandler.Register)
-		router.POST("/auth/login", userHandler.Login)
-		router.GET("/users/:id", userHandler.GetUser)
-		router.PUT("/users", userHandler.UpdateUser)
-		router.DELETE("/users/:id", userHandler.DeleteUser)
+		userRouter.POST("/auth/register", userHandler.Register)
+		userRouter.POST("/auth/login", userHandler.Login)
+		userRouter.GET("/users/:id", userHandler.GetUser)
+		userRouter.PUT("/users", userHandler.UpdateUser)
+		userRouter.DELETE("/users/:id", userHandler.DeleteUser)
 	}
 
 	return userRouter
